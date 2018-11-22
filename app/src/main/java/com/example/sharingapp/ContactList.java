@@ -17,7 +17,7 @@ import java.util.ArrayList;
 /**
  * ContactList class
  */
-public class ContactList {
+public class ContactList extends Observable {
 
     private static ArrayList<Contact> contacts;
     private String FILENAME = "contacts.sav";
@@ -28,6 +28,7 @@ public class ContactList {
 
     public void setContacts(ArrayList<Contact> contact_list) {
         contacts = contact_list;
+        notifyObservers();
     }
 
     public ArrayList<Contact> getContacts() {
@@ -44,10 +45,12 @@ public class ContactList {
 
     public void addContact(Contact contact) {
         contacts.add(contact);
+        notifyObservers();
     }
 
     public void deleteContact(Contact contact) {
         contacts.remove(contact);
+        notifyObservers();
     }
 
     public Contact getContact(int index) {
@@ -97,7 +100,6 @@ public class ContactList {
     }
 
     public void loadContacts(Context context) {
-
         try {
             FileInputStream fis = context.openFileInput(FILENAME);
             InputStreamReader isr = new InputStreamReader(fis);
@@ -105,6 +107,7 @@ public class ContactList {
             Type listType = new TypeToken<ArrayList<Contact>>() {}.getType();
             contacts = gson.fromJson(isr, listType); // temporary
             fis.close();
+            notifyObservers();
         } catch (FileNotFoundException e) {
             contacts = new ArrayList<Contact>();
         } catch (IOException e) {
@@ -120,6 +123,7 @@ public class ContactList {
             gson.toJson(contacts, osw);
             osw.flush();
             fos.close();
+            notifyObservers();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return false;
